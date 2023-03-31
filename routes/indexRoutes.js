@@ -15,12 +15,19 @@ router.get("/room/:id", async (req, res) => {
   }
 });
 
+router.get("/rooms-for/:email", async (req, res) => {
+  try {
+    const room = await Room.find({ participants: { $in: [req.params.email] } });
+    return res.status(200).send(room);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ message: "Internal server error" });
+  }
+});
+
 router.post("/create-room", async (req, res) => {
   try {
-    const room = await Room.create({
-      roomId: "room_20z209_20z222",
-      participants: ["20z209@psgtech.ac.in", "20z222@psgtech.ac.in"],
-    });
+    const room = await Room.create(req.body);
     return res.status(200).send(room);
   } catch (err) {
     console.log(err);

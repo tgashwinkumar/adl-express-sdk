@@ -27,6 +27,10 @@ const schema = new Schema({
     required: true,
     default: "test_room",
   },
+  timeStamp: {
+    type: Date,
+    default: new Date(),
+  },
 });
 
 export default model("Chat", schema);
