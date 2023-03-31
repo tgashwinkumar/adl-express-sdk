@@ -1,17 +1,21 @@
-const express = require("express");
-const socket = require("socket.io");
-
+import express from "express";
+import { Server } from "socket.io";
+import cors from "cors";
+import { connectToServer } from "./mongo/conn.js";
+import indexRoutes from "./routes/indexRoutes.js";
+import Chat from "./models/Chat.js";
+import Room from "./models/Room.js";
 const app = express();
 
+app.use(cors());
 // app.use(express.static('public'))
 
-const server = app.listen(4600, () => {
-  console.log("App listened to the port :- http://localhost:4600/");
-});
+app.use("/api", indexRoutes);
 
-app.get("/", (req, res) => res.send("Qwert Messenger App"));
+import { Server as httpServer } from "http";
 
-const io = socket(server, {
+const http = httpServer(app);
+const io = new Server(http, {
   cors: {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"],
@@ -20,18 +24,33 @@ const io = socket(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log("a user connected:", socket.id);
+  console.log(`⚡: ${socket.id} user just connected!`);
 
-  socket.on("chat", (data) => {
-    console.log("message: " + data.content + "\thandle: " + data.sender);
-    io.sockets.emit("chat", data);
+  socket.on("message", async (data) => {
+    const msg = await Chat.create(data);
+    io.emit("messageResponse", data);
   });
 
-  socket.on("typing", (handle) => {
-    socket.broadcast.emit("typing", handle);
+  socket.on("join-rooms", async (data) => {
+    const { email } = data;
+    const rooms = await Room.find({
+      participants: { $in: [email] },
+    });
+    console.log(rooms.map((r) => r.roomId));
   });
 
   socket.on("disconnect", () => {
-    console.log("user disconnected: ", socket.id);
+    console.log("🔥: A user disconnected");
+  });
+});
+
+connectToServer(function (err) {
+  if (err) {
+    console.error(err);
+    process.exit();
+  }
+
+  http.listen(4600, () => {
+    console.log("App listened to the port :- http://localhost:4600/");
   });
 });
