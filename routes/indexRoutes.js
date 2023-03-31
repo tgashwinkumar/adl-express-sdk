@@ -5,7 +5,7 @@ import User from "../models/User.js";
 
 const router = Router();
 
-router.get("/room/:id",  async (req, res) => {
+router.get("/room/:id", async (req, res) => {
   try {
     const room = await Room.findOne({ roomId: req.params.id });
     return res.status(200).send(room);
@@ -22,6 +22,16 @@ router.post("/create-room", async (req, res) => {
       participants: ["20z209@psgtech.ac.in", "20z222@psgtech.ac.in"],
     });
     return res.status(200).send(room);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ message: "Internal server error" });
+  }
+});
+
+router.get("/user/:email", async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.params.email });
+    return res.status(200).send(user);
   } catch (err) {
     console.log(err);
     return res.status(500).send({ message: "Internal server error" });
