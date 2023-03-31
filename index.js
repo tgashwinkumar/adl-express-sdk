@@ -27,6 +27,7 @@ io.on("connection", (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
 
   socket.on("message", async (data) => {
+    console.log("🚀: data", data);
     const msg = await Chat.create(data);
     io.emit("messageResponse", data);
   });
@@ -36,7 +37,12 @@ io.on("connection", (socket) => {
     const rooms = await Room.find({
       participants: { $in: [email] },
     });
-    console.log(rooms.map((r) => r.roomId));
+    rooms
+      .map((r) => r.roomId)
+      .forEach((r) => {
+        socket.join(r);
+        console.log(`${email} joined ${r} room`);
+      });
   });
 
   socket.on("disconnect", () => {

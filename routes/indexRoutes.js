@@ -4,6 +4,16 @@ import Room from "../models/Room.js";
 
 const router = Router();
 
+router.get("/room/:id",  async (req, res) => {
+  try {
+    const room = await Room.findOne({ roomId: req.params.id });
+    return res.status(200).send(room);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ message: "Internal server error" });
+  }
+});
+
 router.post("/create-room", async (req, res) => {
   try {
     const room = await Room.create({
