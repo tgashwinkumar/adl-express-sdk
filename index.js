@@ -5,10 +5,17 @@ import { connectToServer } from "./mongo/conn.js";
 import indexRoutes from "./routes/indexRoutes.js";
 import Chat from "./models/Chat.js";
 import Room from "./models/Room.js";
+import bodyParser from "body-parser";
 const app = express();
+
+let jsonParser = bodyParser.json();
+let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 app.use(cors());
 // app.use(express.static('public'))
+
+app.use(jsonParser);
+app.use(urlencodedParser);
 
 app.use("/api", indexRoutes);
 
