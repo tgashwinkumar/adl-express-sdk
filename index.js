@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 import cors from "cors";
 import { connectToServer } from "./mongo/conn.js";
 import indexRoutes from "./routes/indexRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
 import Chat from "./models/Chat.js";
 import Room from "./models/Room.js";
 import bodyParser from "body-parser";
@@ -17,6 +18,7 @@ app.use(cors());
 app.use(jsonParser);
 app.use(urlencodedParser);
 
+app.use("/api/upload", uploadRoutes);
 app.use("/api", indexRoutes);
 
 import { Server as httpServer } from "http";
